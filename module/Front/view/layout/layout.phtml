@@ -1,0 +1,22 @@
+<?php echo $this->doctype(); ?>
+<html lang="en">
+<head>
+        <meta charset="utf-8" http-equiv="X-Frame-Options" content="sameorigin">
+        <?php echo $this->headTitle($this->translate('bHive'))->setSeparator(' - ')->setAutoEscape(false) ?>
+        <?php 
+        echo $this->headMeta()
+            ->appendName('viewport', 'width=device-width, initial-scale=1.0')
+            ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
+        ?>
+</head>
+<body class="<?php echo(isset($this->template_body_class)? $this->template_body_class: "home");?>">
+    <div class="wrapper">
+        <div class="container">
+            <?php echo $this->content; ?>
+        </div>
+    </div>
+
+    <?php echo $this->inlineScript(); ?>
+   
+</body>
+</html> 

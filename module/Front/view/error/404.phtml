@@ -1,1 +1,21 @@
-404.phtml
+<H1>404.phtml</H1>
+
+<?php
+
+$vars = $this->viewModel()->getCurrent()->getVariables();
+$viewVars = array();
+
+foreach($this as $name => $value)
+{
+    #if (substr($name, 0, 1) == '_') continue; // protected or private
+
+    $viewVars[$name] = $value;
+}
+
+echo '<pre>';
+echo 'viewVarsKeys => ', print_r(array_keys($viewVars), 1);
+echo 'vars => ', print_r($vars, 1);
+echo '__vars => ', print_r($viewVars['__vars'], 1);
+echo '__varsCache => ', print_r($viewVars['__varsCache'], 1);
+echo '__content => ', print_r($viewVars['__content'], 1);
+echo '</pre>';

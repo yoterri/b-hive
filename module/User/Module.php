@@ -9,9 +9,14 @@ use Zend\EventManager\Event;
 class Module
 {
 
-    public function onBootstrap(Event $e)
+    public function onBootstrap(Event $event)
     {
-        ;
+        #$serviceManager = $event->getApplication()->getServiceManager();
+        #$config = $serviceManager->get('config');
+
+        #echo '<pre>';
+        #print_r($config);
+        #exit;
     }
     
     public function getConfig()

@@ -2,22 +2,33 @@
 
 namespace Bhive\Factory;
 
-use Zend\ServiceManager\AbstractFactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\Factory\AbstractFactoryInterface;
+use Interop\Container\ContainerInterface;
+use Bhive\Controller\AbstractController;
 
 class Controller implements AbstractFactoryInterface
 {
 
-    public function canCreateServiceWithName(ServiceLocatorInterface $locator, $name, $requestedName)
+    public function canCreate(ContainerInterface $container, $requestedName)
     {
-        $flag = class_exists($requestedName . 'Controller');
-        return $flag;
+        #$request = $container->get('request');
+        #$router = $container->get('router');
+        #$route = $router->match($request);
+
+        return class_exists($requestedName . 'Controller');
     }
 
 
-    public function createServiceWithName(ServiceLocatorInterface $locator, $name, $requestedName)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $class = $requestedName . 'Controller';
-        return new $class();
+        $controllerClass = $requestedName . 'Controller';
+        $controller = new $controllerClass();
+
+        if($controller instanceof AbstractController)
+        {
+            $controller->setContainer($container);
+        }
+
+        return $controller;
     }
 }

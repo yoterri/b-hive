@@ -1,6 +1,9 @@
 <?php
 
-use Bhive\Factory\AdapterAbstractServiceFactory;
+use Zend\Db\Adapter\AdapterAbstractServiceFactory;
+use Zend\I18n\Translator\TranslatorInterface;
+use Zend\I18n\Translator\TranslatorServiceFactory;
+use Zend\I18n\View\Helper\Translate;
 
 return array(
 
@@ -9,15 +12,15 @@ return array(
             
             'default' => array(
                 'driver' => 'Mysqli',
-                'database' => 'test',
-                'username' => 'dbuser',
+                'database' => '',
+                'username' => '',
                 'password' => '',
                 'hostname' => 'localhost',
                 'profiler' => true,
                 'charset' => 'UTF8',
                 'options' => array(
                     'buffer_results' => true
-                )
+                ),
             ),
 
             'other' => array(
@@ -46,10 +49,11 @@ return array(
 
         'factories' => array(
             'default' => AdapterAbstractServiceFactory::class,
+            TranslatorInterface::class => TranslatorServiceFactory::class,
         ),
         
         'aliases' => array(
-            'adapter' => 'default'
+            'adapter' => 'default',
         )
     ),
     
@@ -59,33 +63,6 @@ return array(
         'max_execution_time' => 60,
         'date.timezone' => 'America/La_Paz',
         #'error_reporting' => E_ALL,
-    ),
-
-
-    'router' => array(
-
-        'routes' => array(
-
-            'front' => array(
-                'type' => 'Zend\Mvc\Router\Http\Segment',
-                'options' => array(
-                    'route' => '/',
-                    'constraints' => array(),
-                    'defaults' => array(
-                        'controller' => 'Front\Controller\Index',
-                        'action' => 'index' 
-                    ) 
-                ),
-                
-                'may_terminate' => true,
-                
-                'child_routes' => array(
-                    'wildcard' => array(
-                        'type' => 'Wildcard' 
-                    ) 
-                ) 
-            ),
-        )
     ),
 
     'view_manager' => array(
@@ -111,7 +88,13 @@ return array(
         )
     ),
 
+    'view_helpers' => array(
+        'invokables' => array(
+            'translate' => Translate::class,
+        ),
+    ),
+
     'strategies' => array(
-        'ViewJsonStrategy'
+        'ViewJsonStrategy',
     ),
 );

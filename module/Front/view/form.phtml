@@ -1,0 +1,49 @@
+<?php 
+use Zend\Form\View\Helper;
+
+$formHelper = new Helper\Form();
+$labelHelper = new Helper\FormLabel();
+#$elementHelper  = new Helper\FormElement();
+$inputHelper = new Helper\FormInput();
+#$textareaHelper = new Helper\FormTextarea();
+$errorHelper = new Helper\FormElementErrors();
+
+$elements = $this->form->getElements();
+?>
+
+<?php echo $formHelper->openTag($this->form); ?>
+
+<?php foreach($elements as $key => $element) : ?>
+
+    <?php if($element instanceof Zend\Form\Element\Hidden) : ?>
+        <?php 
+            echo $inputHelper($element);
+            echo $errorHelper($element);
+        ?>
+    <?php else: ?>
+        <?php
+        $attr = $element->getAttributes();
+        if(!isset($attr['class']))
+        {
+            $attr['class'] = '';
+        }
+
+        if(false === strpos($attr['class'], 'form-control'))
+        {
+            $attr['class'] .= ' form-control';
+        }
+
+        $element->setAttributes($attr);
+        ?>
+        <div class="form-group">
+            <?php
+            echo $labelHelper->openTag($element), $element->getLabel(), $labelHelper->closeTag($element);
+            echo $inputHelper($element);
+            echo $errorHelper($element);
+            ?>
+        </div>
+    <?php endif; ?>
+
+<?php endforeach; ?>
+
+<?php echo $formHelper->closeTag(); ?>

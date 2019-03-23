@@ -1,6 +1,6 @@
 <?php echo $this->doctype(); ?>
 <html lang="en">
-<head>
+    <head>
         <meta charset="utf-8" http-equiv="X-Frame-Options" content="sameorigin">
         <?php echo $this->headTitle($this->translate('bHive'))->setSeparator(' - ')->setAutoEscape(false) ?>
         <?php 
@@ -8,15 +8,63 @@
             ->appendName('viewport', 'width=device-width, initial-scale=1.0')
             ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
         ?>
-</head>
-<body class="<?php echo(isset($this->template_body_class)? $this->template_body_class: "home");?>">
-    <div class="wrapper">
-        <div class="container">
-            <?php echo $this->content; ?>
-        </div>
-    </div>
 
-    <?php echo $this->inlineScript(); ?>
-   
-</body>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+        <?php 
+        echo $this->headLink()
+            ->prependStylesheet($this->basePath('/assets/css/backend.css'))
+            ->prependStylesheet($this->basePath('/assets/bootstrap/css/bootstrap.min.css'))
+        ?>
+
+        <?php 
+          echo $this->headScript()
+            ->prependFile($this->basePath('/assets/js/jquery.min.js'))
+        ?>
+    </head>
+    <body>
+
+        <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+            <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Company name</a>
+            <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+            <ul class="navbar-nav px-3">
+                <li class="nav-item text-nowrap">
+                    <a class="nav-link" href="#">Sign out</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                    <div class="sidebar-sticky">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#">
+                                    <span data-feather="home"></span>
+                                    Dashboard <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">
+                                    <span data-feather="file"></span>
+                                    Orders
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <?php echo $this->content; ?>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <?php
+            echo $this->inlineScript();
+        ?>
+
+    </body>
 </html> 

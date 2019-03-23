@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `user`(
 ,`first_name` VARCHAR(150)
 ,`last_name` VARCHAR(150)
 ,`email` CHAR(200)
-,`password` VARCHAR(50)
+,`password` VARCHAR(100)
 ,`status` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0=disabled,1=enabled,2=unconfirmed'
 ,`created_on` DATETIME NOT NULL
 

@@ -4,6 +4,7 @@ use Zend\Db\Adapter\AdapterAbstractServiceFactory;
 use Zend\I18n\Translator\TranslatorInterface;
 use Zend\I18n\Translator\TranslatorServiceFactory;
 use Zend\I18n\View\Helper\Translate;
+use Bhive\Factory\AbstractFactory;
 
 return array(
 
@@ -42,6 +43,7 @@ return array(
     'service_manager' => array(
 
         'abstract_factories' => array(
+            AbstractFactory::class
             #'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
             #'Zend\Log\LoggerAbstractServiceFactory',
             #'Com\Service\CommonFactory'
@@ -80,6 +82,7 @@ return array(
             'error/404' => realpath(__DIR__ . '/../view/error/404.phtml'),
             'error/401' => realpath(__DIR__ . '/../view/error/401.phtml'),
             'error/index' => realpath(__DIR__ . '/../view/error/index.phtm'),
+            'form' => realpath(__DIR__ . '/../view/form.phtm'),
             
         ),
 

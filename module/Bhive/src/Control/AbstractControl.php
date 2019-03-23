@@ -12,18 +12,13 @@ use Zend\EventManager\Event;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Stdlib\Parameters;
 
+use Bhive\Communicator;
 use Bhive\ContainerAwareInterface;
 use Bhive\LazyLoadInterface;
 use Bhive\InputFilter\AbstractInputFilter;
 
 abstract class AbstractControl implements ContainerAwareInterface, AdapterAwareInterface, EventManagerAwareInterface, LazyLoadInterface
 {
-
-    /**
-     *
-     * @var Bhive\Communicator
-     */
-    protected $communicator;
 
     /**
      * @var ContainerInterface
@@ -149,42 +144,168 @@ abstract class AbstractControl implements ContainerAwareInterface, AdapterAwareI
      */
     function getCommunicator()
     {
-        if(!$this->communicator instanceof \Bhive\Communicator)
-        {
-            $this->resetCommunicator();
-        }
-        
-        return $this->communicator;
-    }
-
-
-    /**
-     *
-     * @return \Bhive\Control\AbstractControl
-     */
-    function resetCommunicator()
-    {
-        $this->communicator = new \Bhive\Communicator();
-        
-        return $this;
+        return new \Bhive\Communicator();
     }
 
 
     /**
      * @param AbstractInputFilter $filter
+     * @param Communicator $com
      * @return AbstractControl
      */
-    function setFilterError(AbstractInputFilter $filter)
+    function setFilterError(AbstractInputFilter $filter, Communicator $com = null)
     {
         $messages = $filter->getMessages();
-        $com = $this->getCommunicator();
 
+        if(!$com)
+        {
+            $com = $this->getCommunicator();
+        }
+        
         foreach($messages as $key => $item)
         {
             $message = current($item);
             $com->addError($message, $key);
         }
 
-        return $this;
+        return $com;
+    }
+
+
+    /**
+     * @param array | object $data
+     * @return Parameters
+     */
+    function toParams($data)
+    {
+        if(is_object($data))
+        {
+            if(method_exists($data, 'toArray'))
+            {
+                $data = $data->toArray();
+            }
+            elseif(method_exists($data, 'getArrayCopy'))
+            {
+                $data = $data->getArrayCopy();
+            }
+        }
+
+        #
+        if(is_array($data))
+        {
+            $params = new Parameters($data);
+        }
+        elseif($data instanceof Parameters)
+        {
+            $params = $data;
+        }
+        else
+        {
+            throw new \Exception('Invalid parameter provided');
+        }
+        
+        return $params;
+    }
+
+
+    /**
+     * @param Parameters $params
+     * @param string $inputFilterKey
+     * @param string $dbKey
+     *
+     * @return Bhive\Communicator
+     */
+    protected function _save(Parameters $params, $inputFilterKey, $dbKey)
+    {
+        $sm = $this->getContainer();
+        $com = new Communicator();
+
+        try
+        {
+            $inputFilter = $sm->get($inputFilterKey);
+            $inputFilter->build();
+
+            $inputFilter->setData($params->toArray());
+
+            if($inputFilter->isValid())
+            {
+                $db = $sm->get($dbKey);
+                if($params->id)
+                {
+                    $id = $params->id;
+
+                    #
+                    $entity = $db->findByPrimaryKey($id);
+                    if($entity)
+                    {
+                        $values = $inputFilter->getValues(true);
+                        $entity->populate($values);
+
+                        #
+                        $eventParams = array(
+                            'entity' => $entity,
+                            'params' => $params,
+                            'values' => $values,
+                        );
+                        $event = $this->_triggerSavingEvent($eventParams);
+                        $entity = $event->getParam('entity');
+
+                        #
+                        $in = $entity->toArray();
+
+                        $db->doUpdate($in, array('id' => $id));
+
+                        $com->setSuccess('Successfully updated.', array('entity' => $entity));
+                    }
+                    else
+                    {
+                        $com->addError('Record not found.');
+                    }
+                }
+                else
+                {
+                    $entity = $db->getEntity();
+                    $values = $inputFilter->getValues();
+
+                    $entity->exchange($values);
+
+                    #
+                    $eventParams = array(
+                        'entity' => $entity,
+                        'params' => $params,
+                        'values' => $values,
+                    );
+                    $event = $this->_triggerSavingEvent($eventParams);
+                    $entity = $event->getParam('entity');
+
+                    #
+                    $in = $entity->toArray();
+
+                    $id = $db->doInsert($in);
+
+                    $entity->id = $id;
+
+                    $com->setSuccess('Successfully added.', array('entity' => $entity));
+                }
+            }
+            else
+            {
+                $this->setFilterError($inputFilter, $com);
+            }
+        }
+        catch(\Exception $ex)
+        {
+            $com->setException($ex);
+        }
+
+        return $com;
+    }
+
+
+    private function _triggerSavingEvent($eventParams)
+    {
+        $event = new Event('control.save.pre', $this, $eventParams);
+        $this->getEventManager()->triggerEvent($event);
+        return $event;
     }
 }

@@ -29,5 +29,12 @@ class User extends AbstractEntity implements LazyLoadInterface
         ,'status'
         ,'created_on'
     );
+
+
+
+    function isPasswordEncrypted()
+    {
+        return (60 == (strlen($this->password)) && preg_match('/^\$2y\$/', $this->password));
+    }
 }
 

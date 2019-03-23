@@ -9,11 +9,13 @@ return array(
     'Zend\Validator',
     'Zend\Db',
     'Zend\Router',
-
+    'Zend\Form',
+    'Zend\InputFilter',
+    #'Zend\View',
     #'Zend\Cache',
-    #'Zend\Form',
+
     #'Zend\Hydrator',
-    #'Zend\InputFilter',
+    
     #'Zend\Paginator',
     #'Zend\I18n',
     #'Zend\Filter',

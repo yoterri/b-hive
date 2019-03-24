@@ -1,6 +1,45 @@
 <?php
 return array(
-    
+
+    'event_listeners' => array(
+        array(
+            'source_class' => 'User\InputFilter\User',
+            'event_name' => 'pre.validate',
+
+            'callback' => array(
+                'User\Control', 'onPreValidateUser'
+            ),
+        ),
+
+        array(
+            'source_class' => 'User\Control',
+            'event_name' => 'pre.insert.user.db.user',
+            'callback' => array(
+                'User\Control', 'onPreInsertUser'
+            ),
+            'priority' => 1,
+        ),
+
+        array(
+            'source_class' => 'User\Control',
+            'event_name' => 'pre.update.user.db.user',
+            'callback' => array(
+                'User\Control', 'onPreUpdateUser'
+            ),
+        ),
+
+        /*
+        array(
+            'source_class' => 'User\Form\User',
+            'event_name' => 'pre.build',
+            'callback' => array(
+                'User\Control', 
+            ),
+            'priority' => 1,
+        ),
+        */
+    ),
+
     'router' => array(
 
         'routes' => array(

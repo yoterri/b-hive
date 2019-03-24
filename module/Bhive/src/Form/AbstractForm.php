@@ -132,7 +132,7 @@ abstract class AbstractForm extends Form implements LazyLoadInterface, EventMana
         
         #
         $eventParams = array('fields' => $fields);
-        $event = new Event('form.pre.build', $this, $eventParams);
+        $event = new Event('pre.build', $this, $eventParams);
         $this->getEventManager()->triggerEvent($event);
         if($event->propagationIsStopped())
         {
@@ -147,7 +147,7 @@ abstract class AbstractForm extends Form implements LazyLoadInterface, EventMana
         }
 
         #
-        $event = new Event('form.pos.build', $this);
+        $event = new Event('pos.build', $this);
         $this->getEventManager()->triggerEvent($event);
         
         #

@@ -159,7 +159,7 @@ abstract class AbstractInputFilter extends InputFilter implements LazyLoadInterf
 
         #
         $eventParams = array('data' => $data, 'params' => $this->params);
-        $event = $this->_triggerFilterEvent($eventParams, 'inputfilter.set.data.pre');
+        $event = $this->_triggerFilterEvent($eventParams, 'pre.set.data');
         $data = $event->getParam('data');
 
         #
@@ -170,7 +170,7 @@ abstract class AbstractInputFilter extends InputFilter implements LazyLoadInterf
 
         #
         $eventParams = array('data' => $data, 'params' => $this->params);
-        $event = $this->_triggerFilterEvent($eventParams, 'inputfilter.set.data.pos');
+        $event = $this->_triggerFilterEvent($eventParams, 'pos.set.data');
 
         return $this;
     }
@@ -187,7 +187,7 @@ abstract class AbstractInputFilter extends InputFilter implements LazyLoadInterf
         $filters = $this->getFilters();
 
         $eventParams = array('filters' => $filters, 'params' => $this->params);
-        $event = $this->_triggerFilterEvent($eventParams, 'inputfilter.pre.build');
+        $event = $this->_triggerFilterEvent($eventParams, 'pre.build');
         if($event->propagationIsStopped())
         {
             return $this;
@@ -207,7 +207,7 @@ abstract class AbstractInputFilter extends InputFilter implements LazyLoadInterf
 
         #
         $eventParams = array('params' => $this->params);
-        $event = $this->_triggerFilterEvent($eventParams, 'inputfilter.pos.build');
+        $event = $this->_triggerFilterEvent($eventParams, 'pos.build');
         
         return $this;
     }
@@ -241,7 +241,7 @@ abstract class AbstractInputFilter extends InputFilter implements LazyLoadInterf
 
         #
         $eventParams = array('values' => $values, 'only_provided' => $onlyProvided);
-        $event = $this->_triggerFilterEvent($eventParams, 'inputfilter.get.values');
+        $event = $this->_triggerFilterEvent($eventParams, 'pre.get.values');
         if($event->propagationIsStopped())
         {
             return $values;
@@ -269,6 +269,31 @@ abstract class AbstractInputFilter extends InputFilter implements LazyLoadInterf
         return $values;
     }
 
+
+    /**
+     * Is the data set valid?
+     *
+     * @param  mixed|null $context
+     * @throws Exception\RuntimeException
+     * @return bool
+     */
+    public function isValid($context = null)
+    {
+        #
+        $eventParams = array('content' => $context);
+        $event = $this->_triggerFilterEvent($eventParams, 'pre.validate');
+        $context = $event->getParam('context');
+
+        #
+        $flag = parent::isValid($context);
+
+        $eventParams = array('content' => $context, 'flag' => $flag);
+        $event = $this->_triggerFilterEvent($eventParams, 'pos.validate');
+        $flag = $event->getParam('flag');
+
+        #
+        return $flag;
+    }
 
 
     protected function _triggerFilterEvent(array $eventParams, $eventName)

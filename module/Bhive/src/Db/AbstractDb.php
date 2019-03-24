@@ -5,13 +5,12 @@ namespace Bhive\Db;
 /**
  * Events: 
  * db.prefixing
- * db.before_insert
- * db.after_insert
- * db.before_update 
- * db.after_update 
- * db.before_delete
- * db.after_delete
- * 
+ * pre.insert
+ * pos.insert
+ * pre.update
+ * pos.update
+ * pre.delete
+ * pos.delete
  */
 
 use Zend;
@@ -318,7 +317,7 @@ class AbstractDb extends TableGateway implements AdapterAwareInterface, EventMan
     function doInsert(array $data)
     {
         $eventParams = ['data' => $data];
-        $event = new Event('db.before_insert', $this, $eventParams);
+        $event = new Event('pre.insert', $this, $eventParams);
         
         $this->getEventManager()->triggerEvent($event);
         if(!$event->propagationIsStopped())
@@ -346,7 +345,7 @@ class AbstractDb extends TableGateway implements AdapterAwareInterface, EventMan
                 'result' => $result,
                 'last_insert_value' => $result,
             ];
-            $event = new Event('db.after_insert', $this, $eventParams);
+            $event = new Event('pos.insert', $this, $eventParams);
             
             $this->getEventManager()->triggerEvent($event);
         }
@@ -368,7 +367,7 @@ class AbstractDb extends TableGateway implements AdapterAwareInterface, EventMan
     function doUpdate(array $data, $where)
     {
         $eventParams = ['data' => $data, 'where' => $where];
-        $event = new Event('db.before_update', $this, $eventParams);
+        $event = new Event('pre.update', $this, $eventParams);
         
         $this->getEventManager()->triggerEvent($event);
         if(!$event->propagationIsStopped())
@@ -399,7 +398,7 @@ class AbstractDb extends TableGateway implements AdapterAwareInterface, EventMan
                 'result' => $result,
                 'affected_rows' => $result,
             ];
-            $event = new Event('db.after_update', $this, $eventParams);
+            $event = new Event('pos.update', $this, $eventParams);
             
             $this->getEventManager()->triggerEvent($event);
         }
@@ -420,7 +419,7 @@ class AbstractDb extends TableGateway implements AdapterAwareInterface, EventMan
     function doDelete($where)
     {
         $eventParams = ['where' => $where];
-        $event = new Event('db.before_delete', $this, $eventParams);
+        $event = new Event('pre.delete', $this, $eventParams);
         
         $this->getEventManager()->triggerEvent($event);
         if(!$event->propagationIsStopped())
@@ -449,7 +448,7 @@ class AbstractDb extends TableGateway implements AdapterAwareInterface, EventMan
                 'result' => $result,
                 'affected_rows' => $result,
             ];
-            $event = new Event('db.after_delete', $this, $eventParams);
+            $event = new Event('pos.delete', $this, $eventParams);
             
             $this->getEventManager()->triggerEvent($event);
         }

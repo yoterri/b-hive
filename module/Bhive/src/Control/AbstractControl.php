@@ -230,6 +230,8 @@ abstract class AbstractControl implements ContainerAwareInterface, AdapterAwareI
             if($inputFilter->isValid())
             {
                 $db = $sm->get($dbKey);
+
+                $dbKeyEventName = strtolower(str_replace('\\', '.', $dbKey));
                 if($params->id)
                 {
                     $id = $params->id;
@@ -247,15 +249,24 @@ abstract class AbstractControl implements ContainerAwareInterface, AdapterAwareI
                             'params' => $params,
                             'values' => $values,
                         );
-                        $event = $this->_triggerSavingEvent($eventParams);
+                        $event = $this->_triggerEvent("pre.update.{$dbKeyEventName}", $eventParams);
                         $entity = $event->getParam('entity');
 
                         #
                         $in = $entity->toArray();
 
+                        #
                         $db->doUpdate($in, array('id' => $id));
 
+                        #
                         $com->setSuccess('Successfully updated.', array('entity' => $entity));
+                        $eventParams = array(
+                            'communicator' => $com,
+                            'entity' => $entity,
+                            'params' => $params,
+                            'values' => $values,
+                        );
+                        $event = $this->_triggerEvent("pos.update.{$dbKeyEventName}", $eventParams);
                     }
                     else
                     {
@@ -275,7 +286,7 @@ abstract class AbstractControl implements ContainerAwareInterface, AdapterAwareI
                         'params' => $params,
                         'values' => $values,
                     );
-                    $event = $this->_triggerSavingEvent($eventParams);
+                    $event = $this->_triggerEvent("pre.insert.{$dbKeyEventName}", $eventParams);
                     $entity = $event->getParam('entity');
 
                     #
@@ -286,6 +297,15 @@ abstract class AbstractControl implements ContainerAwareInterface, AdapterAwareI
                     $entity->id = $id;
 
                     $com->setSuccess('Successfully added.', array('entity' => $entity));
+
+                    #
+                    $eventParams = array(
+                        'communicator' => $com,
+                        'entity' => $entity,
+                        'params' => $params,
+                        'values' => $values,
+                    );
+                    $event = $this->_triggerEvent("pos.insert.{$dbKeyEventName}", $eventParams);
                 }
             }
             else
@@ -302,9 +322,9 @@ abstract class AbstractControl implements ContainerAwareInterface, AdapterAwareI
     }
 
 
-    private function _triggerSavingEvent($eventParams)
+    private function _triggerEvent($eventName, $eventParams)
     {
-        $event = new Event('control.save.pre', $this, $eventParams);
+        $event = new Event($eventName, $this, $eventParams);
         $this->getEventManager()->triggerEvent($event);
         return $event;
     }
